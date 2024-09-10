@@ -21,7 +21,7 @@ dependencies:
     specifier: ^4.0.7
     version: 4.15.4(typescript@5.6.2)
   micromatch:
-    specifier: ^4.0.5
+    specifier: ^4.0.8
     version: 4.0.8
   solid-js:
     specifier: ^1.8.7

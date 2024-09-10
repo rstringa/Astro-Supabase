@@ -9,6 +9,7 @@ const { data } = (await supabase
   .from("guestbook")
   .select("name, message")
   .order("created_at", { ascending: false })) as { data: GuestbookEntry[] };
+  console.log(data);  
 ---
 
 <Base title="Dashboard">

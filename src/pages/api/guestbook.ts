@@ -6,6 +6,7 @@ export const GET: APIRoute = async () => {
     .from("guestbook")
     .select("*")
     .order("created_at", { ascending: true });
+  
 
   if (error) {
     return new Response(
