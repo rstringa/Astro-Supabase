@@ -7,17 +7,14 @@ import {
 } from "solid-js";
 
 export interface GuestbookEntry {
+  id: number;
   name: string;
   message: string;
 }
 
-const fetcher: ResourceFetcher<true, GuestbookEntry[], GuestbookEntry> = async (
-  _,
-  { refetching, value },
-) => {
+const fetcher: ResourceFetcher<boolean, GuestbookEntry[], unknown> = async (_,) => {
   const res = await fetch("/api/guestbook", {
-    method: refetching ? "POST" : "GET",
-    body: refetching ? JSON.stringify(refetching) : null,
+    method: "GET",
   });
 
   const data = await res.json();
@@ -26,19 +23,16 @@ const fetcher: ResourceFetcher<true, GuestbookEntry[], GuestbookEntry> = async (
     throw new Error(data.message);
   }
 
-  const prev = value ?? [];
-  return [...data, ...prev];
+  return data;
 };
 
 export function Reviews({ reviews }: { reviews: GuestbookEntry[] }) {
-  const [data, { refetch }] = createResource(fetcher, {
+  const [data, { refetch }] = createResource(true, fetcher, {
     initialValue: reviews,
     ssrLoadFrom: "initial",
   });
 
-  const onSubmitHandler: JSX.EventHandler<HTMLFormElement, SubmitEvent> = (
-    e,
-  ) => {
+  const onSubmitHandler: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (e) => {
     e.preventDefault();
     const formElement = e.currentTarget;
     const formData = new FormData(formElement);
@@ -46,8 +40,31 @@ export function Reviews({ reviews }: { reviews: GuestbookEntry[] }) {
     const message = formData.get("message")?.toString();
 
     if (!name || !message) return;
-    refetch({ name, message });
-    formElement.reset();
+
+    const res = await fetch("/api/guestbook", {
+      method: "POST",
+      body: JSON.stringify({ name, message }),
+    });
+
+    if (res.ok) {
+      formElement.reset();
+      refetch();
+    } else {
+      console.error("Failed to add entry");
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    const res = await fetch("/api/guestbook", {
+      method: "DELETE",
+      body: JSON.stringify({ id: id }),
+    });
+
+    if (res.ok) {
+      refetch();
+    } else {
+      console.error("Failed to delete entry");
+    }
   };
 
   return (
@@ -101,6 +118,16 @@ export function Reviews({ reviews }: { reviews: GuestbookEntry[] }) {
           <For each={data()}>
             {(review) => (
               <li class="p-4 border rounded-md bg-white dark:bg-zinc-800 dark:border-zinc-700">
+                <a
+                  class="float-right text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400"
+                  href="#"
+                  onclick={(e) => {
+                    e.preventDefault();
+                    handleDelete(review.id);
+                  }}
+                >
+                  Delete
+                </a>
                 <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
                   {review.name}
                 </p>

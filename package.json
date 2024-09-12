@@ -11,12 +11,15 @@
     "astro": "astro"
   },
   "dependencies": {
+    "@astrojs/react": "^3.6.2",
     "@astrojs/solid-js": "^3.0.2",
     "@astrojs/tailwind": "^5.0.4",
     "@astrojs/vercel": "^6.1.0",
     "@supabase/supabase-js": "^2.39.1",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
     "astro": "^4.0.7",
-    "micromatch": "^4.0.8",
+    "micromatch": "^4.0.5",
     "solid-js": "^1.8.7",
     "tailwindcss": "^3.4.0"
   },
@@ -24,5 +27,7 @@
     "@types/micromatch": "^4.0.6",
     "prettier": "^3.1.1",
     "prettier-plugin-astro": "^0.12.2"
+
   }
+
 }
