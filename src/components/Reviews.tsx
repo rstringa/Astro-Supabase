@@ -2,6 +2,7 @@ import {
   createResource,
   For,
   ErrorBoundary,
+  createSignal,
   type ResourceFetcher,
   type JSX,
 } from "solid-js";
@@ -31,6 +32,8 @@ export function Reviews({ reviews }: { reviews: GuestbookEntry[] }) {
     initialValue: reviews,
     ssrLoadFrom: "initial",
   });
+
+  const [editingId, setEditingId] = createSignal<number | null>(null);
 
   const onSubmitHandler: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (e) => {
     e.preventDefault();
@@ -64,6 +67,20 @@ export function Reviews({ reviews }: { reviews: GuestbookEntry[] }) {
       refetch();
     } else {
       console.error("Failed to delete entry");
+    }
+  };
+
+  const handleEdit = async (id: number, newMessage: string) => {
+    const res = await fetch("/api/guestbook", {
+      method: "PUT",
+      body: JSON.stringify({ id, message: newMessage }),
+    });
+
+    if (res.ok) {
+      setEditingId(null);
+      refetch();
+    } else {
+      console.error("Error al editar la entrada");
     }
   };
 
@@ -118,20 +135,51 @@ export function Reviews({ reviews }: { reviews: GuestbookEntry[] }) {
           <For each={data()}>
             {(review) => (
               <li class="p-4 border rounded-md bg-white dark:bg-zinc-800 dark:border-zinc-700">
-                <a
-                  class="float-right text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400"
-                  href="#"
-                  onclick={(e) => {
+                {editingId() === review.id ? (
+                  <form onSubmit={(e) => {
                     e.preventDefault();
-                    handleDelete(review.id);
-                  }}
-                >
-                  Delete
-                </a>
-                <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
-                  {review.name}
-                </p>
-                <p class="mt-1">{review.message}</p>
+                    const newMessage = (e.target as HTMLFormElement).message.value;
+                    handleEdit(review.id, newMessage);
+                  }}>
+                    <input
+                      type="text"
+                      name="message"
+                      value={review.message}
+                      class="w-full mb-2 rounded-md py-1 px-3 dark:bg-zinc-700 dark:text-zinc-300 border bg-zinc-50 border-zinc-300 dark:border-zinc-600"
+                    />
+                    <button type="submit" class="text-blue-500 dark:text-blue-400 mr-2">Guardar</button>
+                    <button type="button" onClick={() => setEditingId(null)} class="text-zinc-500 dark:text-zinc-400">Cancelar</button>
+                  </form>
+                ) : (
+                  <>
+                    <div class="float-right">
+                      <a
+                        class="text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400 mr-2"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setEditingId(review.id);
+                        }}
+                      >
+                        Editar
+                      </a>
+                      <a
+                        class="text-zinc-500 dark:text-zinc-400 hover:text-blue-500 dark:hover:text-blue-400"
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleDelete(review.id);
+                        }}
+                      >
+                        Eliminar
+                      </a>
+                    </div>
+                    <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">
+                      {review.name}
+                    </p>
+                    <p class="mt-1">{review.message}</p>
+                  </>
+                )}
               </li>
             )}
           </For>

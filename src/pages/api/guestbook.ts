@@ -38,6 +38,7 @@ export const POST: APIRoute = async ({ request }) => {
 
   return new Response(JSON.stringify(data));
 };
+
 export const DELETE: APIRoute = async ({ request }) => {
   const { id } = await request.json();
   const { data, error } = await supabase
@@ -46,6 +47,26 @@ export const DELETE: APIRoute = async ({ request }) => {
     .match({ id: id })
     
     if (error) {
+    return new Response(
+      JSON.stringify({
+        error: error.message,
+      }),
+      { status: 500 },
+    );
+  }
+
+  return new Response(JSON.stringify(data));
+};
+
+export const PUT: APIRoute = async ({ request }) => {
+  const { id, name, message } = await request.json();
+  const { data, error } = await supabase
+    .from("guestbook")
+    .update({ name, message })
+    .eq('id', id)
+    .select();
+
+  if (error) {
     return new Response(
       JSON.stringify({
         error: error.message,
