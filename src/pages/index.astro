@@ -37,25 +37,54 @@ const title = "Supabase and Astro Demo";
 </Base>
 
 <style is:inline>
+  #starfield {
+    animation: moveSide 10s ease-in-out infinite alternate;
+  }
+  @keyframes moveSide {
+    0% {
+      transform: translateX(0) scale(1);
+    }
+    100% {
+      transform: translateX(2%) scale(1.05);
+    }
+  }
   .star {
     position: absolute;
-    width: 5px;
-    height: 5px;
-    background: rgba(93, 193, 243, 0.25);
+    width: 2px;
+    height: 2px;
+  
     border-radius: 50%;
-    box-shadow: 0 0 12px 0px rgba(196, 226, 242, 0.817);
-    filter: blur(1px);
+    box-shadow: 0 0 15px 0px rgba(93, 193, 243, 0.404);
+    
+    animation: light 5s ease-in-out infinite;
+  }
+  @keyframes light {
+    0% {
+      background: rgba(93, 193, 243, 0.15);
+      filter: blur(1px);
+    }
+    50% {
+      background: rgba(147, 210, 242, 0.735);
+    }
+    100% {
+      background: rgba(93, 193, 243, 0.15);
+      filter: blur(3px);
+    }
   }
 </style>
+
+
+
 
 <script is:inline>
   function createStar() {
     const star = document.createElement('div');
+    const size = Math.random() * 8 + 2; 
     star.className = 'star';
     star.style.left = `${Math.random() * 100}%`;
     star.style.top = `${Math.random() * 100}%`;
-    star.style.width = `${Math.random() * 2 + 5}px`;
-    star.style.height = `${Math.random() * 2 + 5}px`;
+    star.style.width = size + 'px';
+    star.style.height = size + 'px';
     star.style.opacity = `${Math.random() * 100}%`;
     return star;
   }
@@ -65,12 +94,20 @@ const title = "Supabase and Astro Demo";
     const starfield = document.getElementById('starfield');
    
     setInterval(() => {
-      const star = createStar(); 
+      const star = createStar();
       starfield?.appendChild(star);
-      const lifespan = Math.random() * 3000 + 5000;
+      
       setTimeout(() => {
-        star.remove();
-      }, lifespan);
+        const fadeOut = setInterval(() => {  
+          star.style.opacity = parseFloat(star.style.opacity) - 0.05;
+          star.style.top = parseFloat(star.style.top) + 2 + '%';
+          star.style.left = parseFloat(star.style.left) + 0.5 + '%';
+          if (parseFloat(star.style.opacity) <= 0) {
+            clearInterval(fadeOut);
+            star.remove();
+          }
+        }, 50);
+      }, Math.random() * 5000 + 10000);
     }, 100);
   }
 
