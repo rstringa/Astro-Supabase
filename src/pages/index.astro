@@ -3,11 +3,12 @@ import Base from "../layout/Base.astro";
 import Supabase from "../icons/Supabase.astro";
 import AstroIcon from "../icons/AstroIcon.astro";
 export const prerender = true;
-const title = "Supabase and Astro Demo";
+const title = "Supabase and Astro Demo"; 
 ---
 
 <Base title={title}>
-  <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center">
+  <main class="flex-1 flex flex-col gap-4 items-center p-4 justify-center relative overflow-hidden">
+    <div id="starfield" class="absolute inset-0 z-0"></div>
     <h1 class="text-2xl sm:text-4xl font-bold text-center">{title}</h1>
 
    
@@ -33,6 +34,43 @@ const title = "Supabase and Astro Demo";
     >
 
   </main>
-
-
 </Base>
+
+<style is:inline>
+  .star {
+    position: absolute;
+    width: 5px;
+    height: 5px;
+    background: rgba(185, 232, 255, 0.25);
+    border-radius: 50%;
+    box-shadow: 0 0 15px 0px rgba(255, 255, 255, 0.817);
+  }
+</style>
+
+<script is:inline>
+  function createStar() {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = `${Math.random() * 100}%`;
+    star.style.top = `${Math.random() * 100}%`;
+    star.style.opacity = `${Math.random() * 100}%`;
+    star.style.animationDuration = `${Math.random() * 3 + 2}s`;
+    return star;
+  }
+
+  function animateStars() {
+   
+    const starfield = document.getElementById('starfield');
+   
+    setInterval(() => {
+      const star = createStar(); 
+      console.log(star);
+      starfield?.appendChild(star);
+      setTimeout(() => {
+        star.remove();
+      }, 5000);
+    }, 100);
+  }
+
+  document.addEventListener('astro:page-load', animateStars());
+</script>
