@@ -41,9 +41,10 @@ const title = "Supabase and Astro Demo";
     position: absolute;
     width: 5px;
     height: 5px;
-    background: rgba(185, 232, 255, 0.25);
+    background: rgba(93, 193, 243, 0.25);
     border-radius: 50%;
-    box-shadow: 0 0 15px 0px rgba(255, 255, 255, 0.817);
+    box-shadow: 0 0 12px 0px rgba(196, 226, 242, 0.817);
+    filter: blur(1px);
   }
 </style>
 
@@ -53,8 +54,9 @@ const title = "Supabase and Astro Demo";
     star.className = 'star';
     star.style.left = `${Math.random() * 100}%`;
     star.style.top = `${Math.random() * 100}%`;
+    star.style.width = `${Math.random() * 2 + 5}px`;
+    star.style.height = `${Math.random() * 2 + 5}px`;
     star.style.opacity = `${Math.random() * 100}%`;
-    star.style.animationDuration = `${Math.random() * 3 + 2}s`;
     return star;
   }
 
@@ -64,11 +66,11 @@ const title = "Supabase and Astro Demo";
    
     setInterval(() => {
       const star = createStar(); 
-      console.log(star);
       starfield?.appendChild(star);
+      const lifespan = Math.random() * 3000 + 5000;
       setTimeout(() => {
         star.remove();
-      }, 5000);
+      }, lifespan);
     }, 100);
   }
 
